@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Typing Speed Test</title>
+
+<style>
+body {
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.container {
+    width: 60%;
+    margin: auto;
+    margin-top: 50px;
+    background: rgba(255,255,255,0.1);
+    padding: 25px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+}
+
+#text span.correct { color: #00ff9d; }
+#text span.wrong { color: red; }
+#text span { font-size: 18px; }
+
+textarea {
+    width: 90%;
+    height: 100px;
+    font-size: 16px;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    margin-top: 15px;
+    border-radius: 8px;
+    border: none;
+    background: #00c6ff;
+    cursor: pointer;
+}
+
+.result {
+    margin-top: 20px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+    <h1>⚡ Typing Speed Test</h1>
+    
+    <p id="text"></p>
+    
+    <textarea id="input" placeholder="Start typing..." disabled></textarea><br>
+    <button onclick="startTest()">Start</button>
+
+    <div class="result">
+        <p>⏱ Time: <span id="time">0</span> sec</p>
+        <p>🚀 Speed: <span id="speed">0</span> WPM</p>
+        <p>🎯 Accuracy: <span id="accuracy">0</span>%</p>
+    </div>
+</div>
+
+<script>
+let startTime;
+let timer;
+let time = 0;
+
+const sentences = [
+    "Typing fast requires practice and focus.",
+    "JavaScript makes web pages interactive.",
+    "Practice daily to improve typing speed.",
+    "Coding is fun when you understand logic.",
+    "Consistency is the key to success.",
+    "Focus on accuracy before speed."
+];
+
+let currentText = "";
+
+function startTest() {
+    clearInterval(timer); // ✅ fix
+
+    let randomText = sentences[Math.floor(Math.random() * sentences.length)];
+    currentText = randomText;
+
+    let textHTML = "";
+    randomText.split("").forEach(char => {
+        textHTML += `<span>${char}</span>`;
+    });
+
+    document.getElementById("text").innerHTML = textHTML;
+
+    document.getElementById("input").value = "";
+    document.getElementById("input").disabled = false;
+    document.getElementById("input").focus();
+
+    time = 0;
+    document.getElementById("time").innerText = time;
+
+    document.getElementById("speed").innerText = 0;
+    document.getElementById("accuracy").innerText = 0;
+
+    startTime = new Date();
+
+    timer = setInterval(() => {
+        time++;
+        document.getElementById("time").innerText = time;
+    }, 1000);
+}
+
+document.getElementById("input").addEventListener("input", function() {
+    let entered = this.value;
+    let spans = document.querySelectorAll("#text span");
+
+    let correct = 0;
+
+    spans.forEach((span, index) => {
+        let char = entered[index];
+
+        if (char == null) {
+            span.classList.remove("correct", "wrong");
+        } else if (char === span.innerText) {
+            span.classList.add("correct");
+            span.classList.remove("wrong");
+            correct++;
+        } else {
+            span.classList.add("wrong");
+            span.classList.remove("correct");
+        }
+    });
+
+    // Accuracy
+    let accuracy = Math.round((correct / entered.length) * 100) || 0;
+    document.getElementById("accuracy").innerText = accuracy;
+
+    // Completed
+    if (entered === currentText) {
+        clearInterval(timer);
+
+        let totalTime = (new Date() - startTime) / 1000;
+        let words = entered.split(" ").length;
+        let speed = Math.round((words / totalTime) * 60);
+
+        document.getElementById("speed").innerText = speed;
+        this.disabled = true;
+    }
+});
+</script>
+
+</body>
+</html>
